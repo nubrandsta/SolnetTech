@@ -1,0 +1,35 @@
+<resources>
+    <string name="app_name">SolnetTech</string>
+    <string name="prompt_lupa">LUPA KATA SANDI</string>
+    <string name="login">MASUK</string>
+    <string name="login_text">Masuk ke Aplikasi</string>
+    <string name="username_text">Masukkan Username</string>
+    <string name="username">Usermame</string>
+    <string name="password_text">Kata Sandi</string>
+    <string name="password_info">Masukkan Kata Sandi</string>
+    <string name="LoginText">Masuk</string>
+    <string name="imageview_login">Logo Solnet\n</string>
+    <string name="icon_username">ikon user\n</string>
+    <string name="text_email">Email</string>
+    <string name="password">Password</string>
+    <string name="icon_password">Ikon Password</string>
+    <string name="forgot_password">Lupa Password?</string>
+    <string name="register">Daftar</string>
+    <string name="text_fullname">Nama Lengkap</string>
+    <string name="text_alamat">Alamat</string>
+    <string name="text_idPelanggan">6 digit ID Teknisi</string>
+    <string name="text_phone">Nomor Telpon</string>
+    <string name="text_info_id">Lihat nomor ID Pelanggan SOLNET yang tertera pada tagihan Anda \n Contoh: SI-TP123456</string>
+    <string name="text_passwordConfirm">Tulis ulang Password</string>
+    <string name="text_password">Password</string>
+    <string name="prompt_pengaduan">Mohon maaf atas ketidaknyamananya. Mohon laporkan masalah atau gangguan yang ada alami agar dapat dilakukan perbaikan</string>
+    <string name="text_deskripsi">Jelaskan Gangguan</string>
+    <string name="text_info_kedatangan">Diperkirakan waktu kedatangan teknisi \n Pukul 23:00 dan 00:00</string>
+    <string name="text_teknisi">Laporan Anda sedang diproses</string>
+    <string name="text_progress">Menunggu Teknisi</string>
+    <string name="laporan">Pengaduan Laporan</string>
+    <string name="faq">Pertanyaan Umum</string>
+    <string name="contact">Hubungi Kami</string>
+    <string name="password_baru">Tulis Password Baru</string>
+    <string name="alamat_baru">Tulis Alamat Baru</string>
+</resources>
