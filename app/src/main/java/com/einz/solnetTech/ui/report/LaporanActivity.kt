@@ -9,7 +9,7 @@ import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog.*
 import com.einz.solnetTech.data.di.ViewModelFactory
 import com.einz.solnetTech.databinding.ActivityLaporanBinding
-import com.einz.solnetTech.data.Result
+import com.einz.solnetTech.data.State
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -37,7 +37,7 @@ class LaporanActivity : AppCompatActivity() {
         viewModel.laporanLiveData.observe(this){
                 laporan ->
             when(laporan){
-                is Result.Success -> {
+                is State.Success -> {
                     binding.apply{
                         val desiredTime = laporan.data?.desiredTime?.toTimestamp()?.toDate()
                         val formattedDesiredTime = if (desiredTime != null) {
@@ -65,11 +65,11 @@ class LaporanActivity : AppCompatActivity() {
                     }
 
                 }
-                is Result.Error -> {
+                is State.Error -> {
 
                     binding.progressBar.visibility = View.GONE
                 }
-                is Result.Loading -> {
+                is State.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                 }
 
@@ -100,17 +100,17 @@ class LaporanActivity : AppCompatActivity() {
 
         viewModel.takeLaporanLiveData.observe(this){
             when(it){
-                is Result.Success -> {
+                is State.Success -> {
                     binding.progressBar.visibility = View.GONE
                     val intent = Intent(this, ActiveLaporanActivity::class.java)
                     startActivity(intent)
                     finish()
 
                 }
-                is Result.Error -> {
+                is State.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }
-                is Result.Loading -> {
+                is State.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                 }
             }

@@ -1,13 +1,8 @@
 package com.einz.solnetTech.ui.report
 
-import androidx.lifecycle.LiveData
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.einz.solnetTech.data.Repository
-import com.einz.solnetTech.data.Result
-import com.einz.solnetTech.data.model.Laporan
-import com.einz.solnetTech.ui.util.Event
 import kotlinx.coroutines.launch
 
 class LaporanViewModel(private val repository: Repository): ViewModel()  {

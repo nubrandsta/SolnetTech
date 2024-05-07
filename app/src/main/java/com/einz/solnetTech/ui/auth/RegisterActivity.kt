@@ -12,7 +12,7 @@ import android.widget.Toast
 import androidx.activity.viewModels
 import com.einz.solnetTech.databinding.ActivityRegisterBinding
 import com.einz.solnetcs.util.ErrorDialog
-import com.einz.solnetTech.data.Result
+import com.einz.solnetTech.data.State
 import com.einz.solnetTech.data.di.ViewModelFactory
 import com.einz.solnetTech.data.model.Teknisi
 import com.einz.solnetTech.ui.util.phoneValidator
@@ -58,9 +58,9 @@ class RegisterActivity : AppCompatActivity() {
 
         viewModel.userLiveData.observe(this) { result->
             when (result) {
-                is Result.Loading -> showLoading(true)
-                is Result.Success -> registerSuccess()
-                is Result.Error -> showError(result.errorMessage)
+                is State.Loading -> showLoading(true)
+                is State.Success -> registerSuccess()
+                is State.Error -> showError(result.errorMessage)
             }
         }
 

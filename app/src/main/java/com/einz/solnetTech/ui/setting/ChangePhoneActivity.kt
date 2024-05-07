@@ -7,11 +7,9 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.einz.solnetTech.R
 import com.einz.solnetTech.data.di.ViewModelFactory
 import com.einz.solnetTech.databinding.ActivityChangePhoneBinding
-import com.einz.solnetTech.databinding.ActivitySettingBinding
-import com.einz.solnetTech.data.Result
+import com.einz.solnetTech.data.State
 
 class ChangePhoneActivity : AppCompatActivity() {
 
@@ -33,14 +31,14 @@ class ChangePhoneActivity : AppCompatActivity() {
         viewModel.teknisiLiveData.observe(this){
             result ->
             when(result){
-                is Result.Success -> {
+                is State.Success -> {
                     idTeknisi = result.data?.idTeknisi.toString()
                     binding.progressBar.visibility = View.GONE
                 }
-                is Result.Error -> {
+                is State.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }
-                is Result.Loading -> {
+                is State.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                 }
             }
@@ -56,15 +54,15 @@ class ChangePhoneActivity : AppCompatActivity() {
             viewModel.changePhoneLiveData.observe(this){
                 result ->
                 when(result){
-                    is Result.Success -> {
+                    is State.Success -> {
                         binding.progressBar.visibility = View.GONE
                         Toast.makeText(this, "Berhasil mengubah nomor telepon", Toast.LENGTH_SHORT).show()
                         finish()
                     }
-                    is Result.Error -> {
+                    is State.Error -> {
                         binding.progressBar.visibility = View.GONE
                     }
-                    is Result.Loading -> {
+                    is State.Loading -> {
                         binding.progressBar.visibility = View.VISIBLE
                     }
                 }

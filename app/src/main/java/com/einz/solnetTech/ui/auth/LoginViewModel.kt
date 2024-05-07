@@ -1,11 +1,8 @@
 package com.einz.solnetTech.ui.auth
 
-import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.einz.solnetTech.data.Repository
-import com.google.firebase.auth.FirebaseUser
-import com.einz.solnetTech.data.Result
 import kotlinx.coroutines.launch
 
 class LoginViewModel(private val repository: Repository): ViewModel() {

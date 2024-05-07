@@ -4,13 +4,11 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
-import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
-import com.einz.solnetTech.R
 import com.einz.solnetTech.data.di.ViewModelFactory
 import com.einz.solnetTech.databinding.ActivityHomeBinding
-import com.einz.solnetTech.data.Result
+import com.einz.solnetTech.data.State
 import com.einz.solnetTech.ui.report.LaporanActivity
 import com.einz.solnetTech.ui.setting.SettingActivity
 
@@ -34,7 +32,7 @@ class HomeActivity : AppCompatActivity() {
         viewModel.teknisiLiveData.observe(this){
             result ->
             when(result){
-                is Result.Success -> {
+                is State.Success -> {
                     binding.apply{
                         val nameTeknisi = result.data?.namaTeknisi
                         val idTech = result.data?.idTeknisi
@@ -51,10 +49,10 @@ class HomeActivity : AppCompatActivity() {
 
                     }
                 }
-                is Result.Error -> {
+                is State.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }
-                is Result.Loading -> {
+                is State.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                 }
 
@@ -66,7 +64,7 @@ class HomeActivity : AppCompatActivity() {
 
         viewModel.laporanLiveData.observe(this) { result ->
             when (result) {
-                is Result.Success -> {
+                is State.Success -> {
 
                     binding.progressBar.visibility = View.GONE
 
@@ -89,11 +87,11 @@ class HomeActivity : AppCompatActivity() {
 
                 }
 
-                is Result.Error -> {
+                is State.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }
 
-                is Result.Loading -> {
+                is State.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                 }
 

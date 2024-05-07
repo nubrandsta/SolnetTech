@@ -9,11 +9,9 @@ import android.util.Log
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.einz.solnetTech.R
 import com.einz.solnetTech.data.di.ViewModelFactory
 import com.einz.solnetTech.databinding.ActivityChangePasswordBinding
-import com.einz.solnetTech.databinding.ActivitySettingBinding
-import com.einz.solnetTech.data.Result
+import com.einz.solnetTech.data.State
 import com.einz.solnetTech.ui.auth.LoginActivity
 
 class ChangePasswordActivity : AppCompatActivity() {
@@ -40,19 +38,19 @@ class ChangePasswordActivity : AppCompatActivity() {
             viewModel.changePasswordLiveData.observe(this){
                 result ->
                 when(result){
-                    is Result.Success -> {
+                    is State.Success -> {
                         viewModel.logout()
                         val intent = Intent(this, LoginActivity::class.java)
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
                         startActivity(intent)
                         finish()
                     }
-                    is Result.Error -> {
+                    is State.Error -> {
                         binding.progressBar.visibility = View.GONE
                         Toast.makeText(this, "Mohon login ulang untuk merubah sandi", Toast.LENGTH_SHORT).show()
                         Log.d("ChangePasswordActivity", "onCreate: ${result.errorMessage}")
                     }
-                    is Result.Loading -> {
+                    is State.Loading -> {
                         binding.progressBar.visibility = View.VISIBLE
                     }
                 }

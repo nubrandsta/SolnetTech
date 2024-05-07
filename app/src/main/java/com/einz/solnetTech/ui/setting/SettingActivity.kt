@@ -8,10 +8,9 @@ import android.util.Log
 import android.view.View
 import androidx.activity.viewModels
 import androidx.appcompat.app.AlertDialog
-import com.einz.solnetTech.R
 import com.einz.solnetTech.data.di.ViewModelFactory
 import com.einz.solnetTech.databinding.ActivitySettingBinding
-import com.einz.solnetTech.data.Result
+import com.einz.solnetTech.data.State
 import com.einz.solnetTech.ui.auth.LoginActivity
 
 class SettingActivity : AppCompatActivity() {
@@ -32,7 +31,7 @@ class SettingActivity : AppCompatActivity() {
         viewModel.teknisiLiveData.observe(this){
             result ->
             when(result){
-                is Result.Success -> {
+                is State.Success -> {
                     binding.apply{
                         val nameTeknisi = result.data?.namaTeknisi
                         val idTech = result.data?.idTeknisi
@@ -43,10 +42,10 @@ class SettingActivity : AppCompatActivity() {
                         progressBar.visibility = View.GONE
                     }
                 }
-                is Result.Error -> {
+                is State.Error -> {
                     binding.progressBar.visibility = View.GONE
                 }
-                is Result.Loading -> {
+                is State.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
                 }
 
@@ -90,7 +89,7 @@ class SettingActivity : AppCompatActivity() {
         viewModel.loggedOutLiveData.observe(this){
                 result ->
             when(result){
-                is Result.Success -> {
+                is State.Success -> {
                     if(result.data == true){
                         val intent = Intent(this, LoginActivity::class.java)
                         intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
@@ -99,10 +98,10 @@ class SettingActivity : AppCompatActivity() {
                     }
 
                 }
-                is Result.Error -> {
+                is State.Error -> {
 
                 }
-                is Result.Loading -> {
+                is State.Loading -> {
                     Log.d("SettingActivity", "Loading")
                 }
             }

@@ -8,20 +8,16 @@ import android.os.Bundle
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import androidx.lifecycle.Observer
 import com.einz.solnetTech.R
 import com.einz.solnetTech.data.di.ViewModelFactory
 import com.einz.solnetTech.databinding.ActivityActiveLaporanBinding
-import com.einz.solnetTech.data.Result
-import com.einz.solnetTech.data.model.Laporan
+import com.einz.solnetTech.data.State
 import com.einz.solnetTech.ui.home.HomeActivity
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.suspendCancellableCoroutine
 import java.text.SimpleDateFormat
 import java.util.Locale
 import android.provider.ContactsContract
-import android.provider.ContactsContract.CommonDataKinds.Phone
 import com.einz.solnetTech.ui.util.phoneValidator
 
 class ActiveLaporanActivity : AppCompatActivity() {
@@ -53,20 +49,20 @@ class ActiveLaporanActivity : AppCompatActivity() {
         viewModel.activeLaporanLiveData.observe(this){
             result ->
             when(result){
-                is Result.Success -> {
+                is State.Success -> {
                     binding.progressBar.visibility = View.GONE
                     activeLaporan = result.data.toString()
                     viewModel.getLaporan(result.data.toString())
 
                 }
-                is Result.Error -> {
+                is State.Error -> {
 //                    binding.progressBar.visibility = View.GONE
 //                    val intent = Intent(this, HomeActivity::class.java)
 //                    startActivity(intent)
 //                    finish()
 
                 }
-                is Result.Loading -> {
+                is State.Loading -> {
                     binding.progressBar.visibility = View.VISIBLE
 
                 }
@@ -76,7 +72,7 @@ class ActiveLaporanActivity : AppCompatActivity() {
         viewModel.laporanLiveData.observe(this){
                 result ->
             when(result){
-                is Result.Success -> {
+                is State.Success -> {
                     idLaporan = result.data?.idLaporan.toString()
                     binding.apply{
                         val desiredTime = result.data?.desiredTime?.toTimestamp()?.toDate()
@@ -296,10 +292,10 @@ class ActiveLaporanActivity : AppCompatActivity() {
                     }
 
                 }
-                is Result.Error -> {
+                is State.Error -> {
 
                 }
-                is Result.Loading -> {
+                is State.Loading -> {
 
                 }
             }

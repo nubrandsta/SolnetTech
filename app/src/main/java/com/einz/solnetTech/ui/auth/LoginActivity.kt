@@ -8,10 +8,9 @@ import android.text.TextWatcher
 import android.view.View
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.einz.solnetTech.R
 import com.einz.solnetTech.data.di.ViewModelFactory
 import com.einz.solnetTech.databinding.ActivityLoginBinding
-import com.einz.solnetTech.data.Result
+import com.einz.solnetTech.data.State
 import com.einz.solnetTech.ui.home.HomeActivity
 import com.einz.solnetcs.util.ErrorDialog
 
@@ -38,13 +37,13 @@ class LoginActivity : AppCompatActivity() {
             viewModel.responseLogin.observe(this){
                     result ->
                 when(result){
-                    is Result.Success -> {
+                    is State.Success -> {
                         viewModel.getTeknisi()
                     }
-                    is Result.Error -> {
+                    is State.Error -> {
                         showError(result.errorMessage)
                     }
-                    is Result.Loading -> {
+                    is State.Loading -> {
                         showLoading(true)
                     }
 
@@ -55,14 +54,14 @@ class LoginActivity : AppCompatActivity() {
             viewModel.teknisiLiveData.observe(this){
                     result1 ->
                 when(result1){
-                    is Result.Success -> {
+                    is State.Success -> {
                         loginSuccess()
                     }
-                    is Result.Error -> {
+                    is State.Error -> {
                         showError("Akun terdaftar sebagai pelanggan! bukan Teknisi!")
                         viewModel.logout()
                     }
-                    is Result.Loading -> {
+                    is State.Loading -> {
                         showLoading(true)
                     }
                 }

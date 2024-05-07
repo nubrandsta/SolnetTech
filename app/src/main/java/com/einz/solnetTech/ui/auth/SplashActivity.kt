@@ -7,12 +7,11 @@ import android.os.Handler
 import android.os.Looper
 import android.widget.Toast
 import androidx.activity.viewModels
-import com.einz.solnetTech.R
 import com.einz.solnetTech.data.di.ViewModelFactory
 import com.einz.solnetTech.databinding.ActivitySplashBinding
 import com.einz.solnetTech.ui.home.HomeActivity
 import com.google.firebase.auth.FirebaseAuth
-import com.einz.solnetTech.data.Result
+import com.einz.solnetTech.data.State
 import com.einz.solnetTech.ui.report.ActiveLaporanActivity
 import com.einz.solnetTech.ui.util.observeOnce
 
@@ -40,18 +39,18 @@ class SplashActivity : AppCompatActivity() {
                 viewModel.checkActiveLaporanLiveData.observeOnce(this){
                     result ->
                     when(result){
-                        is Result.Success -> {
+                        is State.Success -> {
                             val intent = Intent(this@SplashActivity, ActiveLaporanActivity::class.java)
                             startActivity(intent)
                             finish()
                         }
-                        is Result.Error -> {
+                        is State.Error -> {
                             val intent = Intent(this@SplashActivity, HomeActivity::class.java)
                             startActivity(intent)
                             finish()
 
                         }
-                        is Result.Loading -> {
+                        is State.Loading -> {
 
                         }
                     }
