@@ -18,6 +18,8 @@ import kotlinx.coroutines.Dispatchers
 import java.text.SimpleDateFormat
 import java.util.Locale
 import android.provider.ContactsContract
+import android.text.Editable
+import android.text.TextWatcher
 import com.einz.solnetTech.ui.util.phoneValidator
 
 class ActiveLaporanActivity : AppCompatActivity() {
@@ -43,6 +45,8 @@ class ActiveLaporanActivity : AppCompatActivity() {
 
 //        viewModel.laporanLiveData.removeObserver(laporanDoneObserver)
         viewModel.resetLaporan()
+
+        checkInput()
 
 
         viewModel.getActiveLaporan()
@@ -89,6 +93,35 @@ class ActiveLaporanActivity : AppCompatActivity() {
                             "Waktu tidak ditentukan"
                         }
 
+                        val time_process = result.data?.time_processed?.toTimestamp()?.toDate()
+                        val formatted_time_process = if (time_process != null) {
+                            SimpleDateFormat("dd MMMM yyyy HH:mm", Locale.getDefault()).format(time_process)
+                        } else {
+                            "Waktu tidak ditentukan"
+                        }
+
+                        val time_start = result.data?.time_repair_started?.toTimestamp()?.toDate()
+                        val formatted_time_start = if (time_start != null) {
+                            SimpleDateFormat("dd MMMM yyyy HH:mm", Locale.getDefault()).format(time_start)
+                        } else {
+                            "Waktu tidak ditentukan"
+                        }
+
+
+                        val time_finish = result.data?.time_repair_finished?.toTimestamp()?.toDate()
+                        val formatted_time_finish = if (time_finish != null) {
+                            SimpleDateFormat("dd MMMM yyyy HH:mm", Locale.getDefault()).format(time_finish)
+                        } else {
+                            "Waktu tidak ditentukan"
+                        }
+
+                        val time_closed = result.data?.time_repair_closed?.toTimestamp()?.toDate()
+                        val formatted_time_closed = if (time_closed != null) {
+                            SimpleDateFormat("dd MMMM yyyy HH:mm", Locale.getDefault()).format(time_closed)
+                        } else {
+                            "Waktu tidak ditentukan"
+                        }
+
                         binding.fabChat.setOnClickListener {
                             var customerPhone = result.data?.customerPhone
                             customerPhone = phoneValidator(this@ActiveLaporanActivity,customerPhone!!)
@@ -129,13 +162,17 @@ class ActiveLaporanActivity : AppCompatActivity() {
 
                                     fabChat.visibility = View.VISIBLE
                                     btnConfirm.visibility = View.VISIBLE
+                                    etSolution.visibility = View.GONE
+                                    binding.btnConfirm.isEnabled = true
+                                    binding.btnConfirm.error = null
                                     btnConfirm.text = "Konfirmasi Perbaikan Selesai"
+
                                     binding.btnConfirm.setOnClickListener {
                                         val dialog = androidx.appcompat.app.AlertDialog.Builder(this@ActiveLaporanActivity)
                                         dialog.setTitle("Konfirmasi Perbaikan")
                                         dialog.setMessage("Apakah anda yakin ingin melakukan konfirmasi perbaikan selesai?")
                                         dialog.setPositiveButton("Ya") { _, _ ->
-                                            viewModel.updateLaporanStatus(idLaporan,2)
+                                            viewModel.updateLaporanStatus(idLaporan,2, "")
                                             Toast.makeText(this@ActiveLaporanActivity,"Menunggu Konfirmasi Pelanggan", Toast.LENGTH_SHORT).show()
 
                                         }
@@ -168,14 +205,21 @@ class ActiveLaporanActivity : AppCompatActivity() {
                                     tvInfo.visibility = View.GONE
 
                                     fabChat.visibility = View.VISIBLE
-                                    btnConfirm.visibility = View.GONE
+                                    btnConfirm.visibility = View.VISIBLE
+                                    btnConfirm.isEnabled = false
+                                    etSolution.visibility = View.VISIBLE
                                     btnConfirm.text = "Konfirmasi Perbaikan Selesai"
+
+
+
                                     binding.btnConfirm.setOnClickListener {
                                         val dialog = androidx.appcompat.app.AlertDialog.Builder(this@ActiveLaporanActivity)
                                         dialog.setTitle("Konfirmasi Perbaikan")
                                         dialog.setMessage("Apakah anda yakin ingin melakukan konfirmasi perbaikan selesai?")
                                         dialog.setPositiveButton("Ya") { _, _ ->
-                                            viewModel.updateLaporanStatus(idLaporan,2)
+                                            val solution = etSolution.text?.trim().toString()
+                                            viewModel.updateLaporanStatus(idLaporan,3, solution)
+                                            Toast.makeText(this@ActiveLaporanActivity, solution, Toast.LENGTH_SHORT).show()
                                             Toast.makeText(this@ActiveLaporanActivity,"Menunggu Konfirmasi Pelanggan", Toast.LENGTH_SHORT).show()
 
                                         }
@@ -183,22 +227,23 @@ class ActiveLaporanActivity : AppCompatActivity() {
                                         dialog.show()
                                     }
 
-                                    tvTeknisi.text = "Menunggu Konfirmasi Perbaikan Selesai"
-                                    tvTeknisiDesc.text = result.data.teknisi
+                                    tvTeknisi.text = "Proses Perbaikan dimulai, Konfirmasi setelah selesai"
+                                    tvTeknisiDesc.text = "Solusi yang disarankan CS: ${result.data?.proposed_solution}"
 
                                     dotProgress0.setBackgroundResource(R.drawable.progress_dot)
                                     tvProgress0.text = "Laporan sudah diproses"
+                                    tvProgress0Timestamp.text = formatted_time_process
 
                                     dotProgress1.setBackgroundResource(R.drawable.progress_dot)
-                                    tvProgress1.text = "Perbaikan sudah selesai"
+                                    tvProgress1.text = "Perbaikan sedang dilakukan"
+                                    tvProgress1Timestamp.text = formatted_time_start
 
-                                    dotProgress2.setBackgroundResource(R.drawable.progress_dot)
+                                    dotProgress2.setBackgroundResource(R.drawable.progress_dot_inactive)
                                     tvProgress2.text = "Menunggu konfirmasi"
 
                                     dotProgress3.setBackgroundResource(R.drawable.progress_dot_inactive)
                                     tvProgress3.text = "Perbaikan Selesai"
 
-                                    btnConfirm.visibility = View.GONE
                                 }
 
                             }
@@ -209,20 +254,27 @@ class ActiveLaporanActivity : AppCompatActivity() {
 
                                     fabChat.visibility = View.VISIBLE
                                     btnConfirm.visibility = View.GONE
+                                    etSolution.visibility = View.GONE
+                                    tfLayoutSolution.visibility = View.GONE
+                                    binding.btnConfirm.isEnabled = true
+                                    binding.btnConfirm.error = null
 
-                                    tvTeknisi.text = "Perbaikan Telah Dikonfirmasi Pelanggan"
-                                    tvTeknisiDesc.text = "Mohon tunggu verifikasi sistem"
+                                    tvTeknisi.text = "Perbaikan telah anda konfirmasi"
+                                    tvTeknisiDesc.text = "Menunggu Konfirmasi Perbaikan dari Pelanggan"
 
                                     dotProgress0.setBackgroundResource(R.drawable.progress_dot)
                                     tvProgress0.text = "Laporan sudah diproses"
+                                    tvProgress0Timestamp.text = formatted_time_process
 
                                     dotProgress1.setBackgroundResource(R.drawable.progress_dot)
                                     tvProgress1.text = "Perbaikan sudah selesai"
+                                    tvProgress1Timestamp.text = formatted_time_start
 
                                     dotProgress2.setBackgroundResource(R.drawable.progress_dot)
                                     tvProgress2.text = "Perbaikan dikonfirmasi"
+                                    tvProgress2Timestamp.text = formatted_time_finish
 
-                                    dotProgress3.setBackgroundResource(R.drawable.progress_dot)
+                                    dotProgress3.setBackgroundResource(R.drawable.progress_dot_inactive)
                                     tvProgress3.text = "Perbaikan Selesai"
 
                                 }
@@ -233,23 +285,31 @@ class ActiveLaporanActivity : AppCompatActivity() {
                                     view1.visibility = View.GONE
                                     tvInfo.visibility = View.GONE
 
-                                    fabChat.visibility = View.VISIBLE
-                                    btnConfirm.visibility = View.GONE
+                                    fabChat.visibility = View.GONE
+                                    btnConfirm.visibility = View.VISIBLE
+                                    etSolution.visibility = View.GONE
+                                    tfLayoutSolution.visibility = View.GONE
+                                    binding.btnConfirm.isEnabled = true
+                                    binding.btnConfirm.error = null
 
                                     tvTeknisi.text = "Perbaikan Telah Dikonfirmasi Pelanggan"
-                                    tvTeknisiDesc.text = "Mohon tunggu verifikasi sistem"
+                                    tvTeknisiDesc.text = "Tiket Laporan ditutup"
 
                                     dotProgress0.setBackgroundResource(R.drawable.progress_dot)
                                     tvProgress0.text = "Laporan sudah diproses"
+                                    tvProgress0Timestamp.text = formatted_time_process
 
                                     dotProgress1.setBackgroundResource(R.drawable.progress_dot)
                                     tvProgress1.text = "Perbaikan sudah selesai"
+                                    tvProgress1Timestamp.text = formatted_time_start
 
                                     dotProgress2.setBackgroundResource(R.drawable.progress_dot)
                                     tvProgress2.text = "Perbaikan dikonfirmasi"
+                                    tvProgress2Timestamp.text = formatted_time_finish
 
                                     dotProgress3.setBackgroundResource(R.drawable.progress_dot)
                                     tvProgress3.text = "Perbaikan Selesai"
+                                    tvProgress3Timestamp.text = formatted_time_closed
 
                                     viewModel.resetLaporan()
 
@@ -300,17 +360,27 @@ class ActiveLaporanActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+    private fun checkValid(){
+        val solution = binding.etSolution.text.toString()
 
-
-
-
-
-
-
+        if(solution.isNotEmpty()){
+            binding.btnConfirm.isEnabled = true
+            binding.btnConfirm.error = null
+        }
+        else{
+            binding.btnConfirm.isEnabled = false
+            binding.btnConfirm.error = "Isi Solusi Perbaikan!"
+        }
+    }
+    private fun checkInput(){
+        binding.etSolution.addTextChangedListener(object : TextWatcher {
+            override fun beforeTextChanged(string: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(string: CharSequence?, start: Int, before: Int, count: Int) {
+                checkValid()
+            }
+            override fun afterTextChanged(string: Editable?) {}
+        })
 
     }
-
-
-
-
 }

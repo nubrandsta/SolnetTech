@@ -40,9 +40,9 @@ class LaporanViewModel(private val repository: Repository): ViewModel()  {
         }
     }
 
-    fun updateLaporanStatus(idLaporan:String, state:Int){
+    fun updateLaporanStatus(idLaporan:String, state:Int, solution:String){
         viewModelScope.launch {
-            repository.updateLaporanStatus(idLaporan, state)
+            repository.updateLaporanStatus(idLaporan, state, solution)
         }
     }
 

@@ -16,9 +16,18 @@ class HomeViewModel(private val repository: Repository): ViewModel() {
     private val _takeLaporanLiveData = repository.takeLaporanLiveData
     val takeLaporanLiveData = _takeLaporanLiveData
 
-    fun getLaporan(){
+    private val _finishedLaporanLiveData = repository.finishedLaporanLiveData
+    val finishedLaporanLiveData = _finishedLaporanLiveData
+
+    fun getLaporan(daerah: String){
         viewModelScope.launch {
-            repository.listenForUserReportsWithStatusZero()
+            repository.listenForConfirmedReport(daerah)
+        }
+    }
+
+    fun getFinishedLaporan(idTech: Int){
+        viewModelScope.launch {
+            repository.listenForFinishedReport(idTech)
         }
     }
 

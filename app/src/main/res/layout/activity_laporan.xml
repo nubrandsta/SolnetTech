@@ -181,6 +181,35 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tv_textDeskripsiGangguan"/>
 
+    <TextView
+        android:id="@+id/tv_textSolusi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:text="Saran Solusi"
+        android:textSize="16sp"
+        android:fontFamily="@font/ubuntu_regular"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_DeskripsiGangguan"/>
+
+    <TextView
+        android:id="@+id/tv_Solusi"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="16dp"
+        android:text="Cek kabel dan Modem"
+        android:textSize="18sp"
+        android:fontFamily="@font/ubuntu_medium"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tv_textSolusi"
+        app:layout_constraintBottom_toTopOf="@id/btn_confirm"/>
+
 
     <androidx.appcompat.widget.AppCompatButton
         android:id="@+id/btn_confirm"

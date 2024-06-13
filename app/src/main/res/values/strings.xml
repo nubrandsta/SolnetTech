@@ -32,4 +32,6 @@
     <string name="contact">Hubungi Kami</string>
     <string name="password_baru">Tulis Password Baru</string>
     <string name="alamat_baru">Tulis Alamat Baru</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

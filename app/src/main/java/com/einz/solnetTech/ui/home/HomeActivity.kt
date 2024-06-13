@@ -18,7 +18,8 @@ class HomeActivity : AppCompatActivity() {
     private lateinit var factory: ViewModelFactory
     private val viewModel: HomeViewModel by viewModels{factory}
 
-    private var idTeknisiString: Int = 0
+    private var idTeknisiValue: Int = 0
+    private var daerahTeknisiValue: String = ""
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,16 +37,18 @@ class HomeActivity : AppCompatActivity() {
                     binding.apply{
                         val nameTeknisi = result.data?.namaTeknisi
                         val idTech = result.data?.idTeknisi
-                        val daerahTeknisi = result.data?.daerahTeknisi
+                        daerahTeknisiValue = result.data?.daerahTeknisi.toString()
                         val teleponTeknisi = result.data?.noTelpTeknisi
 
                         username.text = "$nameTeknisi"
                         idTeknisi.text = "ID TEKNISI: $idTech"
-                        daerah.text = " DAERAH: $daerahTeknisi"
+                        daerah.text = " DAERAH: $daerahTeknisiValue"
                         telepon.text = "NO TELP: $teleponTeknisi"
 
                         progressBar.visibility = View.GONE
-                        idTeknisiString = idTech!!
+                        idTeknisiValue = idTech!!
+
+                        viewModel.getLaporan(daerahTeknisiValue)
 
                     }
                 }
@@ -60,7 +63,7 @@ class HomeActivity : AppCompatActivity() {
             }
         }
 
-        viewModel.getLaporan()
+
 
         viewModel.laporanLiveData.observe(this) { result ->
             when (result) {
@@ -71,7 +74,7 @@ class HomeActivity : AppCompatActivity() {
                         val adapterLaporan = LaporanAdapter(onClick = { laporan ->
                             val intent = Intent(this, LaporanActivity::class.java)
                             intent.putExtra(LaporanActivity.EXTRA_LAPORAN, laporan.idLaporan)
-                            intent.putExtra(LaporanActivity.EXTRA_TEKNISI, idTeknisiString )
+                            intent.putExtra(LaporanActivity.EXTRA_TEKNISI, idTeknisiValue )
                             startActivity(intent)
                         })
 

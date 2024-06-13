@@ -1,7 +1,9 @@
 package com.einz.solnetTech.data
 
 import android.content.Context
+import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
+import com.einz.solnetTech.data.model.FirebaseTimestamp
 import com.einz.solnetTech.data.model.Laporan
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
@@ -20,6 +22,7 @@ class Repository(private val context: Context) {
     val teknisiLiveData: MutableLiveData<State<Teknisi?>> = MutableLiveData()
 
     val laporanListLiveData: MutableLiveData<State<List<Laporan?>>> = MutableLiveData()
+    val finishedLaporanLiveData: MutableLiveData<State<List<Laporan?>>> = MutableLiveData()
     val laporanLiveData: MutableLiveData<State<Laporan?>> = MutableLiveData()
     val takeLaporanLiveData: MutableLiveData<State<Boolean?>> = MutableLiveData()
     val activeLaporanIdLiveData: MutableLiveData<State<String?>> = MutableLiveData()
@@ -77,15 +80,52 @@ class Repository(private val context: Context) {
             firebaseAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener { task ->
                     if (task.isSuccessful) {
-                        userLiveData.postValue(State.Success(firebaseAuth.currentUser))
-                        loggedOutLiveData.postValue(State.Error("Logged in"))
+                        // Authentication successful
+                        val currentUser = firebaseAuth.currentUser
+                        if (currentUser != null) {
+                            // Check the Realtime Database for technician information
+                            verifyTechnician(email)
+                        } else {
+                            userLiveData.postValue(State.Error("Failed to get current user after login"))
+                        }
                     } else {
+                        // Authentication failed
                         userLiveData.postValue(State.Error(task.exception?.message ?: "Login failed"))
                     }
                 }
         } catch (e: Exception) {
             userLiveData.postValue(State.Error(e.message ?: "Unknown error"))
         }
+    }
+
+    private fun verifyTechnician(email: String) {
+        val databaseReference = db.getReference("techs")
+        databaseReference.orderByChild("email").equalTo(email)
+            .addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(snapshot: DataSnapshot) {
+                    if (snapshot.exists()) {
+                        var technicianFound = false
+                        for (technicianSnapshot in snapshot.children) {
+                            val technician = technicianSnapshot.getValue(Teknisi::class.java)
+                            if (technician != null && technician.jenisTeknisi == "Lapangan") {
+                                teknisiLiveData.postValue(State.Success(technician))
+                                loginSuccessLiveData.postValue(State.Success(true))
+                                technicianFound = true
+                                break
+                            }
+                        }
+                        if (!technicianFound) {
+                            teknisiLiveData.postValue(State.Error("Technician not found or not of type 'Lapangan'"))
+                        }
+                    } else {
+                        teknisiLiveData.postValue(State.Error("Technician not found"))
+                    }
+                }
+
+                override fun onCancelled(error: DatabaseError) {
+                    teknisiLiveData.postValue(State.Error(error.message))
+                }
+            })
     }
 
     suspend fun logout() {
@@ -123,7 +163,7 @@ class Repository(private val context: Context) {
         }
     }
 
-    fun listenForUserReportsWithStatusZero() {
+    fun listenForConfirmedReport(daerah: String) {
         val reportsReference = db.getReference("reports")
         laporanListLiveData.postValue(State.Loading)
 
@@ -137,18 +177,62 @@ class Repository(private val context: Context) {
                     // Iterate through each report under a customer ID
                     customerReportsSnapshot.children.forEach { reportSnapshot ->
                         val report = reportSnapshot.getValue(Laporan::class.java)
-                        // Check if the report's status is '0'
-                        if (report?.status == 0) {
-                            report?.let { allReports.add(it) }
+                        // Check if the report's status is '1' and matches the daerah
+                        if (report?.status == 1 && report.daerah.toString() == daerah) {
+                            report.let { allReports.add(it) }
                         }
                     }
                 }
+
+                // Sort reports by timestamp from latest to oldest
+                allReports.sortWith(compareByDescending<Laporan> {
+                    it.timestamp?.seconds
+                }.thenByDescending {
+                    it.timestamp?.nanoseconds
+                })
 
                 laporanListLiveData.postValue(State.Success(allReports))
             }
 
             override fun onCancelled(databaseError: DatabaseError) {
                 laporanListLiveData.postValue(State.Error(databaseError.message))
+            }
+        })
+    }
+
+    fun listenForFinishedReport(idTech: Int) {
+        val reportsReference = db.getReference("reports")
+        finishedLaporanLiveData.postValue(State.Loading)
+
+        // Real-time listener
+        reportsReference.addValueEventListener(object : ValueEventListener {
+            override fun onDataChange(dataSnapshot: DataSnapshot) {
+                val allReports = mutableListOf<Laporan>()
+
+                // Iterate through each customer's reports
+                dataSnapshot.children.forEach { customerReportsSnapshot ->
+                    // Iterate through each report under a customer ID
+                    customerReportsSnapshot.children.forEach { reportSnapshot ->
+                        val report = reportSnapshot.getValue(Laporan::class.java)
+                        // Check if the report's status is '4' and matches the technician ID
+                        if (report?.status == 4 && report.idTeknisi == idTech) {
+                            report.let { allReports.add(it) }
+                        }
+                    }
+                }
+
+                // Sort reports by timestamp from latest to oldest
+                allReports.sortWith(compareByDescending<Laporan> {
+                    it.timestamp?.seconds
+                }.thenByDescending {
+                    it.timestamp?.nanoseconds
+                })
+
+                finishedLaporanLiveData.postValue(State.Success(allReports))
+            }
+
+            override fun onCancelled(databaseError: DatabaseError) {
+                finishedLaporanLiveData.postValue(State.Error(databaseError.message))
             }
         })
     }
@@ -208,12 +292,20 @@ class Repository(private val context: Context) {
 
                                 reportsLoop@ for (customerSnapshot in reportsSnapshot.children) {
                                     for (reportSnapshot in customerSnapshot.children) {
+
+                                        val time_start_seconds = System.currentTimeMillis() / 1000
+                                        val time_start_nanos = System.currentTimeMillis() % 1000 * 1000000
+                                        val time_start = FirebaseTimestamp()
+                                        time_start.seconds = time_start_seconds
+                                        time_start.nanoseconds = time_start_nanos.toInt()
+
                                         val laporan = reportSnapshot.getValue(Laporan::class.java)
                                         if (laporan?.idLaporan == idLaporan) {
                                             reportSnapshot.ref.child("status").setValue(newStatus)
                                             reportSnapshot.ref.child("idTeknisi").setValue(idTeknisi)
                                             reportSnapshot.ref.child("teknisi").setValue(teknisi?.namaTeknisi ?: "")
                                             reportSnapshot.ref.child("teknisiPhone").setValue(teknisi?.noTelpTeknisi ?: "")
+                                            reportSnapshot.ref.child("time_repair_started").setValue(time_start)
                                             laporanFound = true
                                             takeLaporanLiveData.postValue(State.Success(true))
                                             break@reportsLoop
@@ -242,8 +334,24 @@ class Repository(private val context: Context) {
         })
     }
 
-    fun updateLaporanStatus(idLaporan: String, newStatus: Int) {
+    fun updateLaporanStatus(idLaporan: String, newStatus: Int, solution:String) {
         val reportsReference = db.getReference("reports")
+
+        if(newStatus == 4){
+            val teknisiReference = db.getReference("techs")
+            teknisiReference.orderByChild("activeIdLaporan").equalTo(idLaporan).addListenerForSingleValueEvent(object : ValueEventListener {
+                override fun onDataChange(dataSnapshot: DataSnapshot) {
+                    if (dataSnapshot.exists()) {
+                        for (childSnapshot in dataSnapshot.children) {
+                            childSnapshot.ref.child("activeIdLaporan").setValue("")
+                        }
+                    }
+                }
+
+                override fun onCancelled(databaseError: DatabaseError) {
+                }
+            })
+        }
 
         // Listen for a single event to fetch the data once
         reportsReference.addListenerForSingleValueEvent(object : ValueEventListener {
@@ -256,8 +364,17 @@ class Repository(private val context: Context) {
                     for (reportSnapshot in customerSnapshot.children) {
                         val report = reportSnapshot.getValue(Laporan::class.java)
                         if (report?.idLaporan == idLaporan) {
+
+                            val time_finish_seconds = System.currentTimeMillis() / 1000
+                            val time_finish_nanos = System.currentTimeMillis() % 1000 * 1000000
+                            val time_finish = FirebaseTimestamp()
+                            time_finish.seconds = time_finish_seconds
+                            time_finish.nanoseconds = time_finish_nanos.toInt()
+
                             // Update the status of the found report
                             reportSnapshot.ref.child("status").setValue(newStatus)
+                            reportSnapshot.ref.child("solution").setValue(solution)
+                            reportSnapshot.ref.child("time_repair_finished").setValue(time_finish)
                             laporanFound = true
                             break // Break out of the inner loop
                         }
@@ -305,6 +422,7 @@ class Repository(private val context: Context) {
             }
         })
     }
+
 
     fun resetLaporan(){
         laporanLiveData.postValue(State.Loading)

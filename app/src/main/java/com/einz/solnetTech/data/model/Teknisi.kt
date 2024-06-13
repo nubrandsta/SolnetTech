@@ -6,6 +6,7 @@ data class Teknisi(
     val namaTeknisi: String = "fulan",
     val daerahTeknisi: String = "null",
     val noTelpTeknisi: String = "999999999",
-    val activeIdLaporan: String = ""
+    val activeIdLaporan: String = "",
+    val jenisTeknisi: String = "CS",
 
 )

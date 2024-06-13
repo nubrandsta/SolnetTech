@@ -59,6 +59,7 @@ class LaporanActivity : AppCompatActivity() {
                         tvJenisGangguan.text = laporan.data?.kategori
                         tvAlamatGangguan.text = laporan.data?.alamat
                         tvDeskripsiGangguan.text = laporan.data?.deskripsi
+                        tvSolusi.text = laporan.data?.proposed_solution
 
                         progressBar.visibility = View.GONE
 
@@ -84,7 +85,7 @@ class LaporanActivity : AppCompatActivity() {
 
             // Set a positive button (Yes action)
             builder.setPositiveButton("Iya") { _: DialogInterface, _: Int ->
-                viewModel.takeLaporan(idLaporanString!!,1, idTeknisiString!!)
+                viewModel.takeLaporan(idLaporanString!!,2, idTeknisiString!!)
             }
 
             // Set a negative button (Cancel action)

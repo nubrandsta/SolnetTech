@@ -12,6 +12,7 @@ import com.einz.solnetTech.data.di.ViewModelFactory
 import com.einz.solnetTech.databinding.ActivitySettingBinding
 import com.einz.solnetTech.data.State
 import com.einz.solnetTech.ui.auth.LoginActivity
+import com.einz.solnetTech.ui.home.InactiveLaporanActivity
 
 class SettingActivity : AppCompatActivity() {
 
@@ -19,6 +20,7 @@ class SettingActivity : AppCompatActivity() {
     private lateinit var factory: ViewModelFactory
 
     private val viewModel: SettingViewModel by viewModels{factory}
+    private var idTechnician = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -38,6 +40,7 @@ class SettingActivity : AppCompatActivity() {
 
                         username.text = "$nameTeknisi"
                         idTeknisi.text = "ID TEKNISI: $idTech"
+                        idTechnician = idTech!!
 
                         progressBar.visibility = View.GONE
                     }
@@ -60,6 +63,11 @@ class SettingActivity : AppCompatActivity() {
         }
         binding.changePhone.setOnClickListener {
             val intent = Intent(this, ChangePhoneActivity::class.java)
+            startActivity(intent)
+        }
+        binding.history.setOnClickListener {
+            val intent = Intent(this, InactiveLaporanActivity::class.java)
+            intent.putExtra("idTech", idTechnician)
             startActivity(intent)
         }
         binding.logout.setOnClickListener {

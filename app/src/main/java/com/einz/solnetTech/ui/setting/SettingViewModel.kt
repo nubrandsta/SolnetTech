@@ -19,6 +19,8 @@ class SettingViewModel(private val repository: Repository): ViewModel() {
     private val _loggedOutLiveData = repository.loggedOutLiveData
     val loggedOutLiveData = _loggedOutLiveData
 
+
+
     fun getTeknisi(){
         viewModelScope.launch {
             repository.getTeknisiData()
@@ -43,5 +45,7 @@ class SettingViewModel(private val repository: Repository): ViewModel() {
             repository.logout()
         }
     }
+
+
 
 }
