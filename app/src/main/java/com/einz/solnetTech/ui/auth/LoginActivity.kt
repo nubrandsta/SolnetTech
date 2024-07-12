@@ -48,7 +48,7 @@ class LoginActivity : AppCompatActivity() {
                     }
 
                     else -> {
-                        Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show()}
+                        Toast.makeText(this, "Login Gagak", Toast.LENGTH_SHORT).show()}
                 }
             }
             viewModel.teknisiLiveData.observe(this){
@@ -58,7 +58,7 @@ class LoginActivity : AppCompatActivity() {
                         loginSuccess()
                     }
                     is State.Error -> {
-                        showError("Akun terdaftar sebagai pelanggan! bukan Teknisi!")
+                        showError("Akun tidak terdaftar sebagai Teknisi!")
                         viewModel.logout()
                     }
                     is State.Loading -> {

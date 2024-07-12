@@ -107,7 +107,7 @@ class Repository(private val context: Context) {
                         var technicianFound = false
                         for (technicianSnapshot in snapshot.children) {
                             val technician = technicianSnapshot.getValue(Teknisi::class.java)
-                            if (technician != null && technician.jenisTeknisi == "Lapangan") {
+                            if (technician != null && technician.jenisTeknisi == "Teknisi") {
                                 teknisiLiveData.postValue(State.Success(technician))
                                 loginSuccessLiveData.postValue(State.Success(true))
                                 technicianFound = true
@@ -115,7 +115,7 @@ class Repository(private val context: Context) {
                             }
                         }
                         if (!technicianFound) {
-                            teknisiLiveData.postValue(State.Error("Technician not found or not of type 'Lapangan'"))
+                            teknisiLiveData.postValue(State.Error("Technician not found or not of type 'Teknisi'"))
                         }
                     } else {
                         teknisiLiveData.postValue(State.Error("Technician not found"))
